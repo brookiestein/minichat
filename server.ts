@@ -26,6 +26,14 @@ const io = new Server(server, {connectionStateRecovery: {}});
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 const users: {socket: Socket, username: string}[] = [];
+const emitUsers = () => {
+    let usernames: string[] = [];
+    for (const user of users) {
+        usernames.push(user.username);
+    }
+
+    io.emit("usersChanged", usernames);
+}
 
 app.get("/", (request, response) => {
     response.sendFile(join(__dirname, "index.html"));
@@ -52,6 +60,7 @@ io.on("connection", async (socket) => {
         }
 
         io.emit("newUser", `${username} has jumped in!`);
+        emitUsers();
     });
 
     socket.on("disconnect", () => {
@@ -69,10 +78,11 @@ io.on("connection", async (socket) => {
 
         io.emit("userDisconnected", `${users[index].username} has gone.`);
         users.splice(index, 1);
+        emitUsers();
     });
 
     socket.on("chat message", async (message, clientOffset) => {
-        const user = users.find((user) => user.socket == socket);
+        const user = users.find((user) => user.socket === socket);
         if (user)
             message = `${user.username}: ${message}`;
 

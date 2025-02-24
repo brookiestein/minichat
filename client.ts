@@ -11,6 +11,7 @@ socket.emit("username", username);
 
 const form: HTMLFormElement = document.getElementById("form") as HTMLFormElement;
 const input: HTMLInputElement = document.getElementById("input") as HTMLInputElement;
+const listOfUsers: HTMLUListElement = document.getElementById("connectedUsers") as HTMLUListElement;
 const messages: HTMLUListElement = document.getElementById("messages") as HTMLUListElement;
 const clear: HTMLButtonElement = document.getElementById("clear") as HTMLButtonElement;
 
@@ -26,15 +27,15 @@ form.addEventListener("submit", (e) => {
 });
 
 clear.addEventListener("click", () => {
-    let lis = document.querySelectorAll("li");
+    let lis = document.querySelectorAll("#messages li");
     let li: HTMLLIElement;
-    for (let i = 0; li = lis[i]; ++i) {
+    for (let i = 0; li = lis[i] as HTMLLIElement; ++i) {
         if (li.parentNode)
             li.parentNode.removeChild(li);
     }
 });
 
-socket.on("loggedIn", (alreadyLogged) => {
+socket.on("loggedIn", (alreadyLogged: boolean) => {
     if (alreadyLogged) {
         alert("You're already logged in or there's another user with that name.");
         history.back();
@@ -50,6 +51,21 @@ const addMessage = (message: string) => {
 
 socket.on("newUser", addMessage);
 socket.on("userDisconnected", addMessage);
-socket.on("chat message", (message, serverOffset) => {
+socket.on("chat message", (message: string, serverOffset: number) => {
     addMessage(message);
 });
+
+socket.on("usersChanged", (users: string[]) => {
+    let lis = document.querySelectorAll("#connectedUsers li");
+    let li: HTMLLIElement;
+    for (let i = 0; li = lis[i] as HTMLLIElement; ++i) {
+        if (li.parentNode)
+            li.parentNode.removeChild(li);
+    }
+
+    for (const username of users) {
+        const item = document.createElement("li");
+        item.textContent = username;
+        listOfUsers.appendChild(item);
+    }
+})

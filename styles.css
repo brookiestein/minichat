@@ -43,6 +43,7 @@ body {
     list-style-type: none;
     margin: 0;
     padding: 0;
+    width: 90%;
 }
 
 #messages > li {
@@ -50,5 +51,28 @@ body {
 }
 
 #messages > li:nth-child(odd) {
+    background: #efefef;
+}
+
+aside > p {
+    background: #333;
+    color: #fff;
+    border-radius: 2rem;
+    padding: 0 1rem;
+    font-weight: bold;
+}
+
+aside, #connectedUsers {
+    float: right;
+    text-align: center;
+    width: 10%;
+}
+
+#connectedUsers {
+    list-style-type: none;
+    width: 100%;
+}
+
+#connectedUsers > li:nth-child(odd) {
     background: #efefef;
 }
