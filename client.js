@@ -4,7 +4,12 @@ if (username === null) {
     history.back();
 }
 
-const socket = io({auth: {serverOffset: 0}});
+let counter = 0;
+const socket = io({
+    auth: {
+        serverOffset: 0
+    },
+});
 socket.emit("username", username);
 
 const form = document.getElementById("form");
@@ -12,10 +17,13 @@ const input = document.getElementById("input");
 const messages = document.getElementById("messages");
 const clear = document.getElementById("clear");
 
+input.placeholder = "Write a message";
+
 form.addEventListener("submit", (e) => {
     e.preventDefault();
     if (input.value) {
-        socket.emit("chat message", input.value);
+        const clientOffset = `${socket.id}-${counter++}`;
+        socket.emit("chat message", input.value, clientOffset);
         input.value = "";
     }
 });
@@ -34,24 +42,16 @@ socket.on("loggedIn", (alreadyLogged) => {
     }
 });
 
-socket.on("newUser", (message) => {
+const addMessage = (message) => {
     const item = document.createElement("li");
     item.textContent = message;
     messages.appendChild(item);
     window.scrollTo(0, document.body.scrollHeight);
-});
+};
 
-socket.on("userDisconnected", (message) => {
-    const item = document.createElement("li");
-    item.textContent = message;
-    messages.appendChild(item);
-    window.scrollTo(0, document.body.scrollHeight);
-});
-
+socket.on("newUser", addMessage);
+socket.on("userDisconnected", addMessage);
 socket.on("chat message", (message, serverOffset) => {
-    const item = document.createElement("li");
-    item.textContent = message;
-    messages.appendChild(item);
-    window.scrollTo(0, document.body.scrollHeight);
+    addMessage(message);
     socket.auth.serverOffset = serverOffset;
 });
