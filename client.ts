@@ -1,8 +1,10 @@
-const username = prompt("How should we call you?");
-if (username === null) {
+const userInput = prompt("How should we call you?");
+if (userInput === null) {
     alert("Username is required to chat.");
     history.back();
 }
+
+const username: string = userInput ? userInput : "";
 
 let counter: number = 0;
 const socket = io();
@@ -10,12 +12,23 @@ const socket = io();
 socket.emit("username", username);
 
 const form: HTMLFormElement = document.getElementById("form") as HTMLFormElement;
+const typing: HTMLParagraphElement = document.getElementById("typing") as HTMLParagraphElement;
 const input: HTMLInputElement = document.getElementById("input") as HTMLInputElement;
 const listOfUsers: HTMLUListElement = document.getElementById("connectedUsers") as HTMLUListElement;
 const messages: HTMLUListElement = document.getElementById("messages") as HTMLUListElement;
 const clear: HTMLButtonElement = document.getElementById("clear") as HTMLButtonElement;
+let timer: ReturnType<typeof setTimeout>;
 
 input.placeholder = "Write a message";
+
+input.addEventListener("input", (e) => {
+    socket.emit("typing");
+});
+
+input.addEventListener("keyup", (e) => {
+    clearTimeout(timer);
+    timer = setTimeout(() => { socket.emit("endtyping"); }, 3000);
+});
 
 form.addEventListener("submit", (e) => {
     e.preventDefault();
@@ -53,6 +66,23 @@ socket.on("newUser", addMessage);
 socket.on("userDisconnected", addMessage);
 socket.on("chat message", (message: string, serverOffset: number) => {
     addMessage(message);
+});
+
+socket.on("typing", (message: string) => {
+    if (message.includes(username)) {
+        message = message.replace(username, "");
+    }
+
+    if (message.startsWith(", ")) {
+        message = message.substring(2, message.length);
+    }
+
+    if (message.split(" ").length === 3) {
+        message = message.replace("are", "is");
+        message = message.replace(",", "");
+    }
+
+    typing.textContent = message;
 });
 
 socket.on("usersChanged", (users: string[]) => {

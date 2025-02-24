@@ -4,17 +4,29 @@ body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
 
-#form {
+div {
+    position: fixed;
+}
+
+#form, #typing {
     background: rgba(0, 0, 0, 0.15);
     padding: 0.25rem;
     position: fixed;
-    bottom: 0;
     left: 0;
     right: 0;
     display: flex;
     height: 3rem;
     box-sizing: border-box;
     backdrop-filter: blur(10px);
+    z-index: 2;
+}
+
+#form {
+    bottom: 0;
+}
+
+#typing {
+    z-index: 1;
 }
 
 #input {
