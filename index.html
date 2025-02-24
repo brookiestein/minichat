@@ -5,8 +5,11 @@
         <meta name="viewport" content="width=device-width initial-scale=1.0">
         <title>Brayan's Mini Chat</title>
         <link rel="stylesheet" href="./styles.css">
-        <script src="https://cdn.socket.io/4.8.1/socket.io.min.js" defer></script>
-        <script src="./client.js" defer></script>
+        <script type="module" src="https://cdn.socket.io/4.8.1/socket.io.min.js" defer></script>
+        <script type="module">
+            import {io} from "https://cdn.socket.io/4.8.1/socket.io.esm.min.js";
+        </script>
+        <script type="module" src="./client.js" defer></script>
     </head>
 
     <body>

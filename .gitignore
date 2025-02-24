@@ -1,4 +1,4 @@
 node_modules
-index.js
-*.db
 package-lock.json
+*.js
+*.db

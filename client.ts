@@ -4,25 +4,22 @@ if (username === null) {
     history.back();
 }
 
-let counter = 0;
-const socket = io({
-    auth: {
-        serverOffset: 0
-    },
-});
+let counter: number = 0;
+const socket = io();
+
 socket.emit("username", username);
 
-const form = document.getElementById("form");
-const input = document.getElementById("input");
-const messages = document.getElementById("messages");
-const clear = document.getElementById("clear");
+const form: HTMLFormElement = document.getElementById("form") as HTMLFormElement;
+const input: HTMLInputElement = document.getElementById("input") as HTMLInputElement;
+const messages: HTMLUListElement = document.getElementById("messages") as HTMLUListElement;
+const clear: HTMLButtonElement = document.getElementById("clear") as HTMLButtonElement;
 
 input.placeholder = "Write a message";
 
 form.addEventListener("submit", (e) => {
     e.preventDefault();
     if (input.value) {
-        const clientOffset = `${socket.id}-${counter++}`;
+        const clientOffset: string = `${socket.id}-${counter++}`;
         socket.emit("chat message", input.value, clientOffset);
         input.value = "";
     }
@@ -30,8 +27,10 @@ form.addEventListener("submit", (e) => {
 
 clear.addEventListener("click", () => {
     let lis = document.querySelectorAll("li");
+    let li: HTMLLIElement;
     for (let i = 0; li = lis[i]; ++i) {
-        li.parentNode.removeChild(li);
+        if (li.parentNode)
+            li.parentNode.removeChild(li);
     }
 });
 
@@ -42,7 +41,7 @@ socket.on("loggedIn", (alreadyLogged) => {
     }
 });
 
-const addMessage = (message) => {
+const addMessage = (message: string) => {
     const item = document.createElement("li");
     item.textContent = message;
     messages.appendChild(item);
@@ -53,5 +52,4 @@ socket.on("newUser", addMessage);
 socket.on("userDisconnected", addMessage);
 socket.on("chat message", (message, serverOffset) => {
     addMessage(message);
-    socket.auth.serverOffset = serverOffset;
 });
